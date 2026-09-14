@@ -5,7 +5,7 @@
   const app = document.querySelector("#guide-app");
   const breadcrumbs = document.querySelector("#breadcrumbs");
   const meta = data.meta;
-  const state = { fontScale: Number(localStorage.getItem("wh40k-guide-font-scale") || 1), spacious: localStorage.getItem("wh40k-guide-spacious") === "true", contrast: localStorage.getItem("wh40k-guide-contrast") === "true" };
+  const state = { fontScale: Number(localStorage.getItem("wh40k-guide-font-scale") || 1), spacious: localStorage.getItem("wh40k-guide-spacious") === "true", contrast: localStorage.getItem("wh40k-guide-contrast") === "true", darkMode: localStorage.getItem("wh40k-guide-dark-mode") !== "false" };
 
   const esc = (value = "") => String(value)
     .replace(/&/g, "&amp;")
@@ -33,6 +33,9 @@
   const stat = (label, value) => `<div class="stat"><span class="stat__label">${esc(label)}</span><span class="stat__value">${esc(value || "—")}</span></div>`;
   const routeLink = (route, label, className = "") => `<a class="${className}" href="#${route}" data-route="${route}">${esc(label)}</a>`;
   const buttonLink = (route, label, className = "button") => `<a class="${className}" href="#${route}" data-route="${route}">${esc(label)}</a>`;
+  const imageBlock = (item, className = "") => item?.image
+    ? `<figure class="guide-art${className ? ` ${className}` : ""}"><img src="${esc(item.image)}" alt="${esc(item.name)} illustration" loading="lazy" decoding="async"><figcaption class="sr-only">${esc(item.name)} artwork</figcaption></figure>`
+    : "";
 
   const levelRow = (level) => {
     const names = level.names?.length ? level.names : ["Apply native level scaling and any linked advancement entries."];
@@ -93,13 +96,13 @@
   function renderSpeciesList() {
     return `${pageIntro("Species", `${meta.counts.species} playable species. Start with the short description, then open a species for its full trait list and compatible class links.`, "Chapter 2 · Who you are")}
       <div class="filter-bar"><label class="sr-only" for="species-filter">Filter species</label><input id="species-filter" type="search" data-live-filter="species-card" placeholder="Filter by species or trait…"><span class="filter-note">Tip: search “darkvision”, “small”, or a class name.</span></div>
-      <div class="card-grid">${data.species.map((species) => `<article class="option-card" data-filter-item="species-card" data-filter-text="${esc([species.name, species.description, species.compatibleClasses.join(" "), species.traits.map((trait) => `${trait.name} ${trait.description}`).join(" ")].join(" ").toLowerCase())}"><div class="option-card__top"><h3>${routeLink(`species/${species.slug}`, species.name)}</h3>${statusBadge(species.status)}</div><p class="option-card__meta">${esc(titleCase(species.size))} · ${esc(species.speed)} ft. Speed</p><p>${text(species.traits[0]?.description || species.description)}</p><div>${species.traits.slice(0, 4).map((trait) => tag(trait.name)).join("")}${species.traits.length > 4 ? tag(`+${species.traits.length - 4} more`, true) : ""}</div><div class="option-card__footer"><span class="small muted">${species.traits.length} species traits</span>${buttonLink(`species/${species.slug}`, "Read species", "link-button")}</div></article>`).join("")}</div>`;
+      <div class="card-grid">${data.species.map((species) => `<article class="option-card option-card--illustrated" data-filter-item="species-card" data-filter-text="${esc([species.name, species.description, species.compatibleClasses.join(" "), species.traits.map((trait) => `${trait.name} ${trait.description}`).join(" ")].join(" ").toLowerCase())}">${imageBlock(species, "guide-art--card")}<div class="option-card__body"><div class="option-card__top"><h3>${routeLink(`species/${species.slug}`, species.name)}</h3>${statusBadge(species.status)}</div><p class="option-card__meta">${esc(titleCase(species.size))} · ${esc(species.speed)} ft. Speed</p><p>${text(species.traits[0]?.description || species.description)}</p><div>${species.traits.slice(0, 4).map((trait) => tag(trait.name)).join("")}${species.traits.length > 4 ? tag(`+${species.traits.length - 4} more`, true) : ""}</div><div class="option-card__footer"><span class="small muted">${species.traits.length} species traits</span>${buttonLink(`species/${species.slug}`, "Read species", "link-button")}</div></div></article>`).join("")}</div>`;
   }
 
   function renderSpeciesDetail(species) {
     const compatible = species.compatibleClasses.length ? species.compatibleClasses.map((name) => data.classes.find((item) => item.name === name)).filter(Boolean) : [];
     const traitSummary = species.traits.map((trait) => `<li><strong>${esc(trait.name)}.</strong> ${esc(trait.description)}</li>`).join("");
-    const overview = `<div class="two-column"><div><div class="stat-grid">${stat("Size", titleCase(species.size))}${stat("Speed", `${species.speed} ft.`)}${stat("Traits", species.traits.length)}${stat("Status", species.status === "needs_review" ? "Needs review" : "Current")}</div><div class="callout"><h3>Quick read</h3><p>Choose ${esc(species.name)} when its identity and traits fit the character you want to play. Species traits are granted through the native D&amp;D5e Advancement workflow.</p></div><div class="rich-text">${text(species.description)}</div></div><aside class="reading-panel"><h3>Compatible classes</h3><p class="small muted">Open a class to compare the full progression.</p><ul>${compatible.map((item) => `<li>${routeLink(`classes/${item.slug}`, item.name)}</li>`).join("") || "<li>Check the campaign's compatibility guidance.</li>"}</ul></aside></div>`;
+    const overview = `<div class="two-column"><div>${imageBlock(species, "guide-art--detail")}<div class="stat-grid">${stat("Size", titleCase(species.size))}${stat("Speed", `${species.speed} ft.`)}${stat("Traits", species.traits.length)}${stat("Status", species.status === "needs_review" ? "Needs review" : "Current")}</div><div class="callout"><h3>Quick read</h3><p>Choose ${esc(species.name)} when its identity and traits fit the character you want to play. Species traits are granted through the native D&amp;D5e Advancement workflow.</p></div><div class="rich-text">${text(species.description)}</div></div><aside class="reading-panel"><h3>Compatible classes</h3><p class="small muted">Open a class to compare the full progression.</p><ul>${compatible.map((item) => `<li>${routeLink(`classes/${item.slug}`, item.name)}</li>`).join("") || "<li>Check the campaign's compatibility guidance.</li>"}</ul></aside></div>`;
     const traits = `<div class="reading-panel"><h3>Traits at a glance</h3><p>These are the exact species traits connected to the Species Item.</p><ul class="note-list">${traitSummary}</ul></div>`;
     const build = `<div class="callout callout--green"><h3>Simple choice rule</h3><p>Pick the species whose story and movement feel right. Then use its trait list as a compact reference during play. You do not need to memorize every trait before session one.</p></div><div class="card-grid">${compatible.map((item) => `<article class="quick-card"><h3>${routeLink(`classes/${item.slug}`, item.name)}</h3><p>${esc(item.summary)}</p></article>`).join("")}</div>`;
     return `${pageIntro(species.name, `A focused species page: first the quick facts, then the full trait text, then a small build note.`, "Chapter 2 · Species")}${tabbed([{ id: "overview", label: "At a glance" }, { id: "traits", label: "Traits" }, { id: "build", label: "Build notes" }], [{ id: "overview", content: overview }, { id: "traits", content: traits }, { id: "build", content: build }], `species-${species.slug}`)}`;
@@ -115,12 +118,12 @@
   function renderClassesList() {
     return `${pageIntro("Classes", `${meta.counts.classes} base classes. Each class page begins with an easy summary, then shows its level 1–20 track and subclass choices.`, "Chapter 4 · What you do")}
       <div class="callout"><h3>Pick a role before you pick a feature</h3><p>Ask: do I want to lead from the front, control space, solve problems, support the group, or bring dangerous power? The short summary on each card is enough for a first pass.</p></div>
-      <div class="card-grid">${data.classes.map((cls) => `<article class="option-card"><div class="option-card__top"><h3>${routeLink(`classes/${cls.slug}`, cls.name)}</h3>${statusBadge(cls.status)}</div><p>${esc(cls.summary)}</p><div class="stat-grid">${stat("Chassis", cls.chassis)}${stat("Hit Die", cls.hitDie)}${stat("Primary ability", cls.primaryAbility.join(" / ") || cls.primaryAbility)}${stat("Subclass", cls.subclassCadence)}</div><p class="small"><strong>Casting:</strong> ${esc(cls.spellcasting?.progression || "none")} · <strong>Subclasses:</strong> ${cls.subclassIds.length}</p><div>${cls.subclassIds.map((id) => { const sub = subclassById(id); return sub ? tag(sub.name, true) : ""; }).join("")}</div><div class="option-card__footer">${buttonLink(`classes/${cls.slug}`, "Read class", "link-button")}</div></article>`).join("")}</div>`;
+      <div class="card-grid">${data.classes.map((cls) => `<article class="option-card option-card--illustrated">${imageBlock(cls, "guide-art--card")}<div class="option-card__body"><div class="option-card__top"><h3>${routeLink(`classes/${cls.slug}`, cls.name)}</h3>${statusBadge(cls.status)}</div><p>${esc(cls.summary)}</p><div class="stat-grid">${stat("Chassis", cls.chassis)}${stat("Hit Die", cls.hitDie)}${stat("Primary ability", cls.primaryAbility.join(" / ") || cls.primaryAbility)}${stat("Subclass", cls.subclassCadence)}</div><p class="small"><strong>Casting:</strong> ${esc(cls.spellcasting?.progression || "none")} · <strong>Subclasses:</strong> ${cls.subclassIds.length}</p><div>${cls.subclassIds.map((id) => { const sub = subclassById(id); return sub ? tag(sub.name, true) : ""; }).join("")}</div><div class="option-card__footer">${buttonLink(`classes/${cls.slug}`, "Read class", "link-button")}</div></div></article>`).join("")}</div>`;
   }
 
   function renderClassDetail(cls) {
     const subclasses = cls.subclassIds.map(subclassById).filter(Boolean);
-    const overview = `<div class="two-column"><div><div class="stat-grid">${stat("Chassis", cls.chassis)}${stat("Hit Die", cls.hitDie)}${stat("Primary ability", cls.primaryAbility.join(" / ") || cls.primaryAbility)}${stat("Subclass levels", cls.subclassCadence)}</div><div class="callout"><h3>Recommended starting array</h3><p>${esc(cls.recommendedArray)}</p></div><div class="rich-text">${text(cls.text)}</div></div><aside class="reading-panel"><h3>At a glance</h3><ul class="note-list"><li><strong>Role:</strong> ${esc(cls.summary)}</li><li><strong>Casting:</strong> ${esc(cls.spellcasting?.progression || "none")}</li><li><strong>Preparation:</strong> ${esc(cls.spellcasting?.preparation || "native class rules")}</li></ul><p>${buttonLink(`level-up/${cls.slug}`, `Open ${cls.name} level track`, "link-button")}</p></aside></div>`;
+    const overview = `<div class="two-column"><div>${imageBlock(cls, "guide-art--detail")}<div class="stat-grid">${stat("Chassis", cls.chassis)}${stat("Hit Die", cls.hitDie)}${stat("Primary ability", cls.primaryAbility.join(" / ") || cls.primaryAbility)}${stat("Subclass levels", cls.subclassCadence)}</div><div class="callout"><h3>Recommended starting array</h3><p>${esc(cls.recommendedArray)}</p></div><div class="rich-text">${text(cls.text)}</div></div><aside class="reading-panel"><h3>At a glance</h3><ul class="note-list"><li><strong>Role:</strong> ${esc(cls.summary)}</li><li><strong>Casting:</strong> ${esc(cls.spellcasting?.progression || "none")}</li><li><strong>Preparation:</strong> ${esc(cls.spellcasting?.preparation || "native class rules")}</li></ul><p>${buttonLink(`level-up/${cls.slug}`, `Open ${cls.name} level track`, "link-button")}</p></aside></div>`;
     const track = `<p class="page-intro">Read down the table. Gold rows mark a larger decision or milestone. Open a linked feature when you want the exact text.</p>${levelsTable(cls.levels, `${cls.name} level progression`)}`;
     const subclassList = `<div class="card-grid">${subclasses.map((subclass) => `<article class="option-card"><div class="option-card__top"><h3>${routeLink(`subclasses/${subclass.slug}`, subclass.name)}</h3>${subclass.restriction ? tag(subclass.restriction, true) : ""}</div><p>${esc(subclass.summary)}</p><p class="small muted">Features at: ${subclass.levels.filter((level) => level.names.length).map((level) => level.level).join(", ") || "See source entry"}</p><div class="option-card__footer">${buttonLink(`subclasses/${subclass.slug}`, "Read subclass", "link-button")}</div></article>`).join("")}</div>`;
     return `${pageIntro(cls.name, `${esc(cls.summary)} Choose this page's first tab for the short read, its second tab for the full level track, and its third tab for specialization choices.`, "Chapter 4 · Classes")}${tabbed([{ id: "overview", label: "Overview" }, { id: "track", label: "Level 1–20" }, { id: "subclasses", label: "Subclasses" }], [{ id: "overview", content: overview }, { id: "track", content: track }, { id: "subclasses", content: subclassList }], `class-${cls.slug}`)}`;
@@ -269,11 +272,14 @@
   }
 
   function applyReadingSettings() {
+    document.body.classList.toggle("dark-mode", state.darkMode);
     document.body.classList.toggle("spacious", state.spacious);
     document.body.classList.toggle("high-contrast", state.contrast);
     document.documentElement.style.setProperty("--body-size", `${(1.08 * state.fontScale).toFixed(3)}rem`);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", state.darkMode ? "#0b1321" : "#18243c");
     document.querySelector('[data-reading-action="spacious"]')?.setAttribute("aria-pressed", String(state.spacious));
     document.querySelector('[data-reading-action="contrast"]')?.setAttribute("aria-pressed", String(state.contrast));
+    document.querySelector('[data-reading-action="dark"]')?.setAttribute("aria-pressed", String(state.darkMode));
   }
 
   document.querySelectorAll("[data-count]").forEach((element) => { element.textContent = meta.counts[element.dataset.count] ?? ""; });
@@ -289,9 +295,11 @@
     if (action === "smaller") state.fontScale = Math.max(.9, state.fontScale - .05);
     if (action === "spacious") state.spacious = !state.spacious;
     if (action === "contrast") state.contrast = !state.contrast;
+    if (action === "dark") state.darkMode = !state.darkMode;
     localStorage.setItem("wh40k-guide-font-scale", String(state.fontScale));
     localStorage.setItem("wh40k-guide-spacious", String(state.spacious));
     localStorage.setItem("wh40k-guide-contrast", String(state.contrast));
+    localStorage.setItem("wh40k-guide-dark-mode", String(state.darkMode));
     applyReadingSettings();
   }));
   window.addEventListener("hashchange", render);
