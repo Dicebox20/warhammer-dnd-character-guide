@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#18243c">
+    <meta name="description" content="A calm, navigable Warhammer D&D guide for character creation, classes, species, subclasses, and level advancement.">
+    <title>Warhammer D&D · Character Creation &amp; Advancement</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="guide-data.js"></script>
+    <script src="guide.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to guide content</a>
+
+    <header class="site-header">
+      <div class="brand-block">
+        <a class="brand-mark" href="#start" data-route="start" aria-label="Warhammer D&amp;D Character Guide home">
+          <span class="brand-mark__sigil" aria-hidden="true">✦</span>
+          <span>WARHAMMER D&amp;D</span>
+        </a>
+        <div>
+          <p class="eyebrow">Player's guide · Character creation &amp; advancement</p>
+          <h1>Build a character. Follow the path.</h1>
+        </div>
+      </div>
+      <div class="header-tools" aria-label="Reading tools">
+        <form class="search-form" id="search-form" role="search">
+          <label class="sr-only" for="global-search">Search this guide</label>
+          <input id="global-search" type="search" autocomplete="off" placeholder="Search the guide…" spellcheck="false">
+          <button type="submit" aria-label="Search">Search</button>
+        </form>
+        <div class="reading-tools">
+          <span class="tool-label">Reading tools</span>
+          <button class="tool-button" type="button" data-reading-action="smaller" aria-label="Make text smaller">A−</button>
+          <button class="tool-button" type="button" data-reading-action="larger" aria-label="Make text larger">A+</button>
+          <button class="tool-button" type="button" data-reading-action="spacious" aria-pressed="false">Spacing</button>
+          <button class="tool-button" type="button" data-reading-action="contrast" aria-pressed="false">Contrast</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="site-shell">
+      <aside class="sidebar" aria-label="Guide navigation">
+        <div class="sidebar__intro">
+          <span class="sidebar__label">Navigate</span>
+          <p>Take one section at a time. Every card opens to a focused page.</p>
+        </div>
+
+        <nav class="main-nav">
+          <a href="#start" data-route="start"><span class="nav-number">01</span><span>Start here</span></a>
+          <a href="#create" data-route="create"><span class="nav-number">02</span><span>Build a character</span></a>
+          <a href="#species" data-route="species"><span class="nav-number">03</span><span>Species</span><span class="nav-count" data-count="species"></span></a>
+          <a href="#backgrounds" data-route="backgrounds"><span class="nav-number">04</span><span>Backgrounds</span><span class="nav-count" data-count="backgrounds"></span></a>
+          <a href="#classes" data-route="classes"><span class="nav-number">05</span><span>Classes</span><span class="nav-count" data-count="classes"></span></a>
+          <a href="#subclasses" data-route="subclasses"><span class="nav-number">06</span><span>Subclasses</span><span class="nav-count" data-count="subclasses"></span></a>
+          <a href="#level-up" data-route="level-up"><span class="nav-number">07</span><span>Level up</span></a>
+          <a href="#options" data-route="options"><span class="nav-number">08</span><span>Talents &amp; powers</span></a>
+          <a href="#foundry" data-route="foundry"><span class="nav-number">09</span><span>Foundry guide</span></a>
+          <a href="#glossary" data-route="glossary"><span class="nav-number">10</span><span>Glossary</span></a>
+        </nav>
+
+        <div class="sidebar__footer">
+          <p class="sidebar__label">At a glance</p>
+          <p><strong data-count="species"></strong> species · <strong data-count="classes"></strong> classes · <strong data-count="subclasses"></strong> subclasses</p>
+          <p class="muted">Rules baseline: D&amp;D 2024</p>
+        </div>
+      </aside>
+
+      <main id="main-content" class="main-content" tabindex="-1">
+        <div class="breadcrumbs" id="breadcrumbs" aria-label="Breadcrumbs"></div>
+        <div id="guide-app" aria-live="polite"></div>
+      </main>
+    </div>
+
+    <footer class="site-footer">
+      <p><strong>Warhammer D&amp;D Character Guide</strong> · Source-aligned presentation layer · Content version <span data-meta="version"></span></p>
+      <p class="muted">Use the linked native Documents and manual fallbacks as the rules authority.</p>
+    </footer>
+  </body>
+</html>
